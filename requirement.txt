@@ -1,0 +1,4 @@
+tensorflow
+supabase
+transformers
+numpy
