@@ -3,7 +3,4 @@ transformers[tf]==4.40.0
 supabase
 numpy
 requests
-xml
 bs4
-time
-datetime
