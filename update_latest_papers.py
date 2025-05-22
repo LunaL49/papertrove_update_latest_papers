@@ -4,7 +4,6 @@ import os
 import tensorflow as tf
 from transformers import TFAutoModel, AutoTokenizer
 import numpy as np
-import csv
 import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup

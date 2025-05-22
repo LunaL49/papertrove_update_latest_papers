@@ -2,7 +2,6 @@ tensorflow==2.15.0
 transformers[tf]==4.40.0
 supabase
 numpy
-csv
 requests
 xml
 bs4
