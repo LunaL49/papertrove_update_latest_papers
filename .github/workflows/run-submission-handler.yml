@@ -1,4 +1,4 @@
-name: Process Submissions
+name: Update latest_papers database
 
 on:
   schedule:
