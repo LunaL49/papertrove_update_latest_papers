@@ -44,7 +44,6 @@ for i in range(0,len(new_submissions)):
     if no_abstract_update: # for an existing user who's not updating their preference vec
       data = {
         "email": new_submissions[i]["email"],
-        "journals": new_submissions[i]["journals"],
         "frequency": new_submissions[i]["frequency"],
         "digest_length": new_submissions[i]["digest_length"]
       }
@@ -55,7 +54,6 @@ for i in range(0,len(new_submissions)):
     pref_vec = calc_pref_vec(new_submissions[i]["abstracts"])
     data = {
     "email": new_submissions[i]["email"],
-    "journals": new_submissions[i]["journals"],
     "frequency": new_submissions[i]["frequency"],
     "digest_length": new_submissions[i]["digest_length"],
     "embedding" : pref_vec.tolist() # tolist is important to make sure the data sent is JSON serialisable
