@@ -147,19 +147,18 @@ def get_tlabs_from_crossref_api(doi):
 
   try:
     response = requests.get(url, headers=headers)
+    response = response.json()
+    title = response.get('message', {}).get('title', '')[0]
+    clean_title = BeautifulSoup(title, "html.parser").get_text()
+    abstract = response.get('message', {}).get('abstract', '')
+    clean_abstract = BeautifulSoup(abstract, "html.parser").get_text()
+    clean_abstract = " ".join(clean_abstract.split())
+    author = response.get('message', {}).get('author', '')[0]
+    author = author["given"] + " " + author["family"]
   except:
     clean_title = ""
     clean_abstract = ""
     author = ""
-
-  response = response.json()
-  title = response.get('message', {}).get('title', '')[0]
-  clean_title = BeautifulSoup(title, "html.parser").get_text()
-  abstract = response.get('message', {}).get('abstract', '')
-  clean_abstract = BeautifulSoup(abstract, "html.parser").get_text()
-  clean_abstract = " ".join(clean_abstract.split())
-  author = response.get('message', {}).get('author', '')[0]
-  author = author["given"] + " " + author["family"]
 
   return clean_title, clean_abstract, author
 
