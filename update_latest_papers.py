@@ -91,7 +91,7 @@ journal_name_to_rss_url = {
     "Matter" : "https://www.cell.com/matter/inpress.rss",
     "Cell Reports Methods" : "https://www.cell.com/cell-reports-methods/inpress.rss",
     "Cell Reports Sustainability" : "https://www.cell.com/cell-reports-sustainability/inpress.rss",
-    "Heliyon" : "https://www.cell.com/heliyon/inpress.rss",
+    "Heliyon" : "https://www.cell.com/heliyon/current.rss",
     "iScience" : "https://www.cell.com/iscience/inpress.rss",
     "One Earth" : "https://www.cell.com/one-earth/inpress.rss",
     "Patterns" : "https://www.cell.com/patterns/inpress.rss",
@@ -219,7 +219,7 @@ def get_info_Cell(journal_name :str, date :str, doi_to_title_abs :dict):
 
   for child in root.findall('item', namespaces):
     if date in child.find('dc:date', namespaces).text:
-      if child.find('prism:section', namespaces).text in ["Article", "Short article", "Resource"]:
+      if child.find('prism:section', namespaces).text in ["Article", "Short article", "Resource","Research Article"]:
         doi = child.find('dc:identifier', namespaces).text
         title = child.find('title', namespaces).text
         description = child.find('description', namespaces).text
