@@ -317,6 +317,7 @@ def encode_papers(doi_to_title_abs, doi_to_vector):
   last = results.last_hidden_state[:, 0, :]
   embeds = tf.nn.l2_normalize(last, axis=1) # this is the raw EagerTensor output
   embeds = tf.keras.backend.get_value(embeds)
+  embeds = embeds / np.linalg.norm(embeds)
 
   counter = 0 # initialise at element 0 of embeds, adds one after processing each paper
   for paper in doi_to_title_abs:
