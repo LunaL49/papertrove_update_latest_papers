@@ -147,13 +147,10 @@ def get_tlabs_from_crossref_api(doi):
 
   try:
     response = requests.get(url, headers=headers)
-    response.raise_for_status()  # Raise an HTTPError if response code is 4xx or 5xx
-  except requests.exceptions.HTTPError as e:
-    print(f"HTTP Error: {e}")
-    raise
-  except requests.exceptions.RequestException as e:
-    print(f"Request Error: {e}")
-    raise
+  except:
+    clean_title = ""
+    clean_abstract = ""
+    author = ""
 
   response = response.json()
   title = response.get('message', {}).get('title', '')[0]
@@ -171,7 +168,8 @@ def batch_call_crossref_aaas(doi_to_title_abs, doi_list):
   for i in range(0,len(doi_list)):
     title , abstract, author = get_tlabs_from_crossref_api(doi_list[i])
     link = "https://www.science.org/doi/abs/" + str(doi_list[i])
-    doi_to_title_abs[doi_list[i]] = [title, abstract, link, author]
+    if title != "": # if title is not empty (which can happen in case CrossRef failed)
+      doi_to_title_abs[doi_list[i]] = [title, abstract, link, author]
     sleep(0.1) # rests for 0.1s between crossref api calls to not exceed request limit
   return doi_to_title_abs
 
