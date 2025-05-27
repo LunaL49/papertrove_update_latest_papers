@@ -2,7 +2,7 @@ name: Update latest_papers database
 
 on:
   schedule:
-    - cron: "0 4 * * *" # Runs daily at 4AM
+    - cron: "0 7 * * *" # Runs daily at 7AM UTC
   workflow_dispatch: # Enables manual trigger
 
 jobs:
