@@ -303,7 +303,7 @@ doi_to_title_abs = get_date_info(names, yesterday, doi_to_title_abs)
 
 print(f"There are {len(doi_to_title_abs)} new papers published yesterday.")
 
-if(len(doi_to_title_abs>0)):
+if len(doi_to_title_abs)>0:
   # encode title + abstract into vector embeddings 
   tokenizer = AutoTokenizer.from_pretrained("allenai/specter")
   encoder = TFAutoModel.from_pretrained("allenai/specter")
