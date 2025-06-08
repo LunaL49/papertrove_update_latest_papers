@@ -303,41 +303,41 @@ doi_to_title_abs = get_date_info(names, yesterday, doi_to_title_abs)
 
 print(f"There are {len(doi_to_title_abs)} new papers published yesterday.")
 
+if(len(doi_to_title_abs>0)):
+  # encode title + abstract into vector embeddings 
+  tokenizer = AutoTokenizer.from_pretrained("allenai/specter")
+  encoder = TFAutoModel.from_pretrained("allenai/specter")
 
-# encode title + abstract into vector embeddings 
-tokenizer = AutoTokenizer.from_pretrained("allenai/specter")
-encoder = TFAutoModel.from_pretrained("allenai/specter")
+  doi_to_vector = {}
 
-doi_to_vector = {}
+  def encode_papers(doi_to_title_abs, doi_to_vector):
+    papers = [doi_to_title_abs[paper][0] + tokenizer.sep_token + doi_to_title_abs[paper][1] for paper in doi_to_title_abs]
+    inputs = tokenizer(papers, padding="max_length", truncation=True, max_length=512, return_tensors="tf")
+    results = encoder(**inputs)
+    last = results.last_hidden_state[:, 0, :]
+    embeds = tf.nn.l2_normalize(last, axis=1) # this is the raw EagerTensor output
+    embeds = tf.keras.backend.get_value(embeds)
 
-def encode_papers(doi_to_title_abs, doi_to_vector):
-  papers = [doi_to_title_abs[paper][0] + tokenizer.sep_token + doi_to_title_abs[paper][1] for paper in doi_to_title_abs]
-  inputs = tokenizer(papers, padding="max_length", truncation=True, max_length=512, return_tensors="tf")
-  results = encoder(**inputs)
-  last = results.last_hidden_state[:, 0, :]
-  embeds = tf.nn.l2_normalize(last, axis=1) # this is the raw EagerTensor output
-  embeds = tf.keras.backend.get_value(embeds)
+    counter = 0 # initialise at element 0 of embeds, adds one after processing each paper
+    for paper in doi_to_title_abs:
+      doi_to_vector[paper] = embeds[counter]
+      counter +=1
 
-  counter = 0 # initialise at element 0 of embeds, adds one after processing each paper
-  for paper in doi_to_title_abs:
-    doi_to_vector[paper] = embeds[counter]
-    counter +=1
+    return doi_to_vector
 
-  return doi_to_vector
+  doi_to_vector = encode_papers(doi_to_title_abs, doi_to_vector)
 
-doi_to_vector = encode_papers(doi_to_title_abs, doi_to_vector)
+  print(f"{len(doi_to_vector)} new papers have been encoded.")
 
-print(f"{len(doi_to_vector)} new papers have been encoded.")
-
-for key in doi_to_title_abs:
-  data = {
-    "doi": key,
-    "title": doi_to_title_abs[key][0],
-    "abstract": doi_to_title_abs[key][1],
-    "author": doi_to_title_abs[key][3],
-    "link": doi_to_title_abs[key][2],
-    "embedding" : doi_to_vector[key].tolist() # tolist is important to make sure the data sent is JSON serialisable
-    }
-  response = supabase.table("latest_papers").insert(data).execute()
-  if response.data:
-    print("inserted new paper to latest_paper database")
+  for key in doi_to_title_abs:
+    data = {
+      "doi": key,
+      "title": doi_to_title_abs[key][0],
+      "abstract": doi_to_title_abs[key][1],
+      "author": doi_to_title_abs[key][3],
+      "link": doi_to_title_abs[key][2],
+      "embedding" : doi_to_vector[key].tolist() # tolist is important to make sure the data sent is JSON serialisable
+      }
+    response = supabase.table("latest_papers").insert(data).execute()
+    if response.data:
+      print("inserted new paper to latest_paper database")
