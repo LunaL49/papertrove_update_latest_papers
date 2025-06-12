@@ -219,17 +219,19 @@ def get_info_Cell(journal_name :str, date :str, doi_to_title_abs :dict):
 
   for child in root.findall('item', namespaces):
     if date in child.find('dc:date', namespaces).text:
-      if child.find('prism:section', namespaces).text in ["Article", "Short article", "Resource","Research Article"]:
-        doi = child.find('dc:identifier', namespaces).text
-        title = child.find('title', namespaces).text
-        description = child.find('description', namespaces).text
-        link = child.find('link', namespaces).text
-        if "?rss=yes" in link:
-          link = link.replace("?rss=yes", "")
-        author = child.find("dc:creator", namespaces).text
-        author = author.split(",", 1)[0]
-
-        doi_to_title_abs[doi] = [title, description, link, author]
+      try:
+        if child.find('prism:section', namespaces).text in ["Article", "Short article", "Resource","Research Article"]:
+          doi = child.find('dc:identifier', namespaces).text
+          title = child.find('title', namespaces).text
+          description = child.find('description', namespaces).text
+          link = child.find('link', namespaces).text
+          if "?rss=yes" in link:
+            link = link.replace("?rss=yes", "")
+          author = child.find("dc:creator", namespaces).text
+          author = author.split(",", 1)[0]
+          doi_to_title_abs[doi] = [title, description, link, author]
+      except:
+         continue
 
   return doi_to_title_abs
 
