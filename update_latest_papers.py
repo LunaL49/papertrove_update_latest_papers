@@ -75,6 +75,7 @@ journal_name_to_rss_url = {
     "Current Biology" : "https://www.cell.com/current-biology/inpress.rss",
     "Developmental Cell" : "https://www.cell.com/developmental-cell/inpress.rss",
     "Molecular Cell" : "https://www.cell.com/molecular-cell/inpress.rss",
+    "Cell Systems" : "https://www.cell.com/cell-systems/inpress.rss",
     "Neuron" : "https://www.cell.com/neuron/inpress.rss",
     "PNAS" : "https://www.pnas.org/action/showFeed?type=searchTopic&taxonomyCode=type&tagCode=research-article",
     #"Bioinformatics" : "https://academic.oup.com/rss/site_5139/advanceAccess_3001.xml",
