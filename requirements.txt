@@ -1,6 +1,7 @@
-tensorflow==2.15.0
-transformers[tf]==4.40.0
-supabase
+torch>=2.2.0
+transformers>=4.40.0
+huggingface_hub>=0.23.0
 numpy
 requests
 bs4
+supabase
