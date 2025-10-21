@@ -1,8 +1,8 @@
 
 from supabase import create_client
 import os
-from transformers import AutoModel, AutoTokenizer
-import torch
+from transformers import TFAutoModel, AutoTokenizer
+import tensorflow as tf
 import numpy as np
 import requests
 import xml.etree.ElementTree as ET
@@ -287,19 +287,18 @@ print(f"There are {len(doi_to_title_abs)} new papers published yesterday.")
 
 if len(doi_to_title_abs)>0:
   # encode title + abstract into vector embeddings 
-  tokenizer = AutoTokenizer.from_pretrained("allenai/specter2_base")
-  encoder = AutoModel.from_pretrained("allenai/specter2_base")
+  tokenizer = AutoTokenizer.from_pretrained("allenai/specter")
+  encoder = TFAutoModel.from_pretrained("allenai/specter")
 
   doi_to_vector = {}
 
   def encode_papers(doi_to_title_abs, doi_to_vector):
     papers = [doi_to_title_abs[paper][0] + tokenizer.sep_token + doi_to_title_abs[paper][1] for paper in doi_to_title_abs]
-    inputs = tokenizer(papers, padding="max_length", truncation=True, max_length=512, return_tensors="pt")
-    with torch.no_grad():
-      results = encoder(**inputs)
-      last = results.last_hidden_state[:, 0, :]
-      embeds = torch.nn.functional.normalize(last, p=2, dim=1) 
-      embeds = embeds.cpu().numpy()
+    inputs = tokenizer(papers, padding="max_length", truncation=True, max_length=512, return_tensors="tf")
+    results = encoder(**inputs)
+    last = results.last_hidden_state[:, 0, :]
+    embeds = tf.nn.l2_normalize(last, axis=1) # this is the raw EagerTensor output
+    embeds = tf.keras.backend.get_value(embeds)
 
     counter = 0 # initialise at element 0 of embeds, adds one after processing each paper
     for paper in doi_to_title_abs:
