@@ -46,7 +46,6 @@ journal_name_to_rss_url = {
     "Nature Energy" : "https://www.nature.com/nenergy.rss",
     "Nature Food" : "https://www.nature.com/natfood.rss",
     "Nature Genetics" : "https://www.nature.com/ng.rss",
-    "Nature Geoscience" :"https://www.nature.com/ngeo.rss",
     "Nature Human Behaviour" : "https://www.nature.com/nathumbehav.rss",
     "Nature Immunology" : "https://www.nature.com/ni.rss",
     "Nature Machine Intelligence" : "https://www.nature.com/natmachintell.rss",
