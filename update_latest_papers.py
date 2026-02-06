@@ -213,7 +213,7 @@ def get_info_Cell(journal_name :str, date :str, doi_to_title_abs :dict):
 # fetch "doi":["title", "description"] into a dictionary, for OUP journals, adjusts to some different styles
 def get_info_OUP(journal_name :str, date :str, doi_to_title_abs :dict):
   headers = {
-    'User-Agent': 'paper_recommender/0.1 (mailto:{"luna.q.y.li@gmail.com"})'
+    'User-Agent': 'paper_recommender/0.1'
     }
   resp = requests.get(journal_name_to_rss_url[journal_name], headers=headers) # NOTE: OUP's .xml file is weird, can't be parsed normally
   resp = resp.content.decode('utf-8')
