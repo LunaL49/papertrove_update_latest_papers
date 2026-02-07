@@ -15,6 +15,7 @@ SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 yesterday = str(datetime.date.today() - datetime.timedelta(days = 1)) # for any day, parse all the articles published the day before
+PNAS_date = str(datetime.date.today() - datetime.timedelta(days = 3)) # for PNAS, parse all articles from 3 days before
 doi_to_title_abs = {}
 doi_to_vector = {}
 
@@ -72,9 +73,7 @@ journal_name_to_rss_url = {
     "Molecular Cell" : "https://www.cell.com/molecular-cell/inpress.rss",
     "Cell Systems" : "https://www.cell.com/cell-systems/inpress.rss",
     "Neuron" : "https://www.cell.com/neuron/inpress.rss",
-    "PNAS" : "https://www.pnas.org/action/showFeed?type=searchTopic&taxonomyCode=type&tagCode=research-article",
-    #"Bioinformatics" : "https://academic.oup.com/rss/site_5139/advanceAccess_3001.xml",
-    #"Brain" : "https://academic.oup.com/rss/site_5367/advanceAccess_3228.xml"
+    "PNAS" : "https://www.pnas.org/action/showFeed?type=searchTopic&taxonomyCode=type&tagCode=research-article"
      }
 
 # AAAS journals: get dois from RSS feed
@@ -115,7 +114,7 @@ def get_dois_from_rss_pnas(journal_name :str, date :str):
 # this is only used for AAAS journals and PNAS, abstract in metadata on CrossRef
 def get_tlabs_from_crossref_api(doi):
   headers = {
-    'User-Agent': 'paper_recommender/0.1 (mailto:{"luna.q.y.li@gmail.com"})'
+    'User-Agent': 'paper_recommender/0.1 (mailto:{"levania.loy@gmail.com"})'
     }
   base_url = "https://api.crossref.org"
   url = f"{base_url}/works/{doi}"
@@ -210,41 +209,8 @@ def get_info_Cell(journal_name :str, date :str, doi_to_title_abs :dict):
 
   return doi_to_title_abs
 
-# fetch "doi":["title", "description"] into a dictionary, for OUP journals, adjusts to some different styles
-def get_info_OUP(journal_name :str, date :str, doi_to_title_abs :dict):
-  headers = {
-    'User-Agent': 'paper_recommender/0.1'
-    }
-  resp = requests.get(journal_name_to_rss_url[journal_name], headers=headers) # NOTE: OUP's .xml file is weird, can't be parsed normally
-  resp = resp.content.decode('utf-8')
-  root = ET.fromstring(resp)
-  channel = root.find("channel")
-
-  date_to_store = date
-  #change time format
-  date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d %b %Y')
-
-  for item in channel.findall("item"):
-    if date in item.find("pubDate").text:
-      title = item.find("title").text
-      doi = item.find("guid").text # this actually gives an https address, split to find doi
-      doi = doi.split("doi.org/",1)[1]
-      try:
-        description = item.find("description")
-        description = BeautifulSoup(description.text,"html.parser").get_text()
-      except:
-        description = "" 
-      link = item.find("link").text
-      if "?rss=1" in link:
-        link = link.replace("?rss=1", "")
-      author = ""
-
-      doi_to_title_abs[doi] = [title, description, link, author]
-
-  return doi_to_title_abs
-
 # remember that with AAAS and PNAS, the link field is not filled out in the doi_to_title_abs dictionary, create the link using the base url
-def get_date_info(journal_name_list, date, doi_to_title_abs):
+def get_date_info(journal_name_list, date, PNAS_date, doi_to_title_abs):
   for journal in journal_name_list:
     url = journal_name_to_rss_url[journal] # call global dictionary
 
@@ -262,12 +228,8 @@ def get_date_info(journal_name_list, date, doi_to_title_abs):
       print(f"Successfully retrieved data for {journal} published on {date}!")
 
     elif "https://www.pnas.org/" in url: # PNAS
-      doi_list = get_dois_from_rss_pnas(journal, date)
+      doi_list = get_dois_from_rss_pnas(journal, PNAS_date)
       doi_to_title_abs = batch_call_crossref_pnas(doi_to_title_abs, doi_list)
-      print(f"Successfully retrieved data for {journal} published on {date}!")
-
-    elif "https://academic.oup.com/" in url: # OUP portfolio journal
-      doi_to_title_abs = get_info_OUP(journal, date, doi_to_title_abs)
       print(f"Successfully retrieved data for {journal} published on {date}!")
 
   return doi_to_title_abs
@@ -276,7 +238,7 @@ names = []
 for key in journal_name_to_rss_url:
   names.append(key)
 
-doi_to_title_abs = get_date_info(names, yesterday, doi_to_title_abs)
+doi_to_title_abs = get_date_info(names, yesterday, PNAS_date, doi_to_title_abs)
 
 print(f"There are {len(doi_to_title_abs)} new papers published yesterday.")
 
